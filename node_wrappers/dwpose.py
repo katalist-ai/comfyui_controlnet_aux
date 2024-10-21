@@ -31,9 +31,9 @@ class DWPose_Preprocessor:
     @classmethod
     def INPUT_TYPES(s):
         return define_preprocessor_inputs(
-            detect_hand=INPUT.COMBO(["enable", "disable"]),
-            detect_body=INPUT.COMBO(["enable", "disable"]),
-            detect_face=INPUT.COMBO(["enable", "disable"]),
+            detect_hand=INPUT.COMBO(["enable", "disable", "enabled", "disabled"]),
+            detect_body=INPUT.COMBO(["enable", "disable", "enabled", "disabled"]),
+            detect_face=INPUT.COMBO(["enable", "disable", "enabled", "disabled"]),
             resolution=INPUT.RESOLUTION(),
             bbox_detector=INPUT.COMBO(
                 ["yolox_l.torchscript.pt", "yolox_l.onnx", "yolo_nas_l_fp16.onnx", "yolo_nas_m_fp16.onnx", "yolo_nas_s_fp16.onnx"],
@@ -43,7 +43,7 @@ class DWPose_Preprocessor:
                 ["dw-ll_ucoco_384_bs5.torchscript.pt", "dw-ll_ucoco_384.onnx", "dw-ll_ucoco.onnx"],
                 default="dw-ll_ucoco_384_bs5.torchscript.pt"
             ),
-            scale_stick_for_xinsr_cn=INPUT.COMBO(["disable", "enable"])
+            scale_stick_for_xinsr_cn=INPUT.COMBO(["disable", "enable", "disabled", "enabled"])
         )
 
     RETURN_TYPES = ("IMAGE", "POSE_KEYPOINT")
@@ -76,10 +76,10 @@ class DWPose_Preprocessor:
             det_filename=bbox_detector, pose_filename=pose_estimator,
             torchscript_device=model_management.get_torch_device()
         )
-        detect_hand = detect_hand == "enable"
-        detect_body = detect_body == "enable"
-        detect_face = detect_face == "enable"
-        scale_stick_for_xinsr_cn = scale_stick_for_xinsr_cn == "enable"
+        detect_hand = detect_hand == "enable" or detect_hand == "enabled"   
+        detect_body = detect_body == "enable" or detect_body == "enabled"
+        detect_face = detect_face == "enable" or detect_face == "enabled"
+        scale_stick_for_xinsr_cn = scale_stick_for_xinsr_cn == "enable" or scale_stick_for_xinsr_cn == "enabled"
         self.openpose_dicts = []
         def func(image, **kwargs):
             pose_img, openpose_dict = model(image, **kwargs)
